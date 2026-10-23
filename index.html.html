@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Multiplication Detective: The Missing Treasure</title>
+<style>
+:root{--night:#0f2c36;--ink:#17323b;--amber:#f2a900;--leaf:#2a9d6f;--plum:#6b4e9b;--sky:#2f80b9;--coral:#d4553a;--mist:#e6f0ef;--card:#fbfefd}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Avenir Next","Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:radial-gradient(1100px 560px at 50% -8%,#1f5766,var(--night));padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:.25em 0;line-height:1.15}
+h1{font-size:clamp(30px,7vw,52px)}h2{font-size:clamp(24px,5vw,34px)}
+main{max-width:860px;margin:0 auto;padding:12px 0 40px}
+.card{background:var(--card);border-radius:24px;padding:clamp(16px,4vw,32px);box-shadow:0 12px 32px #0007;margin-bottom:14px}
+.hud{display:flex;align-items:center;gap:12px;color:#fff;padding:6px 4px 12px;font-size:16px}
+.hud strong{font-family:Georgia,serif;font-size:18px;white-space:nowrap}
+.meter{flex:1;height:14px;background:#ffffff30;border-radius:9px;overflow:hidden}
+.meter span{display:block;height:100%;background:linear-gradient(90deg,var(--amber),#ffd75e);border-radius:9px;transition:width .5s}
+.btn{font:inherit;font-weight:700;font-size:20px;min-height:56px;padding:12px 26px;border:0;border-radius:16px;background:var(--amber);color:#2b1d00;cursor:pointer;box-shadow:0 4px 0 #b57f00;touch-action:manipulation}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #b57f00}
+.btn.alt{background:var(--mist);box-shadow:0 4px 0 #b7c9c7;color:var(--ink)}
+.btn[disabled]{opacity:.55;cursor:default}
+button:focus-visible,input:focus-visible{outline:4px solid var(--plum);outline-offset:3px}
+.meta{margin:0;font-size:17px;color:#46606a}
+.q{font-size:clamp(24px,5vw,34px);font-weight:700;margin:10px 0 14px;line-height:1.25}
+.eq{font-size:clamp(40px,10vw,64px);font-family:Georgia,serif;text-align:center;margin:8px 0 18px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.opts.long{grid-template-columns:1fr}
+.opt{font:inherit;font-size:clamp(24px,5vw,32px);font-weight:700;min-height:76px;border:3px solid var(--sky);background:#fff;color:var(--ink);border-radius:18px;cursor:pointer;display:flex;align-items:center;gap:14px;padding:10px 16px;text-align:left;touch-action:manipulation}
+.opts.long .opt{font-size:clamp(18px,3.6vw,23px);font-weight:600}
+.opt b{flex:none;width:34px;height:34px;border-radius:50%;background:var(--sky);color:#fff;font-size:18px;display:grid;place-items:center}
+.opt.tried{background:#eef1f2;border:3px dashed #9fb0b5;color:#6d7f85}.opt.tried b{background:#9fb0b5}
+.opt.right{background:#d9f3e7;border-color:var(--leaf)}.opt.right b{background:var(--leaf)}
+.typed{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin:12px 0}
+.typed label{width:100%;font-weight:700}
+.typed input{font:inherit;font-size:36px;width:160px;padding:8px 14px;border:3px solid var(--sky);border-radius:16px;text-align:center}
+.pds{display:flex;gap:8px;margin:8px 0}.pd{width:26px;height:10px;border-radius:6px;background:#cfdcdb}.pd.on{background:var(--leaf)}.pd.now{background:var(--amber)}
+.vis{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:10px 0 16px}
+.grp{display:flex;flex-wrap:wrap;gap:5px;width:84px;padding:8px;border:3px dashed #9ab;border-radius:16px;justify-content:center}
+.vis i,.grp i{width:20px;height:20px;border-radius:50%;display:block;box-shadow:inset -3px -3px 0 #0002}
+.arr{display:grid;gap:6px;justify-content:center;padding:12px;background:#eaf3ef;border-radius:16px;width:fit-content;margin:10px auto 16px}
+.tip{background:#eef7f3;border-left:6px solid var(--leaf);padding:10px 14px;border-radius:10px;font-size:18px;margin:8px 0}
+.hints li{background:#fff7de;border-left:6px solid var(--amber);padding:10px 14px;margin:8px 0;border-radius:10px;list-style:none;font-size:19px}
+.hints{padding:0;margin:6px 0}
+.good{font-size:24px;font-weight:700;color:#1b7a52;margin:8px 0}.soft{font-size:20px;font-weight:600;color:#4b3a8a;margin:8px 0}
+.why{font-size:19px;background:#eef7f3;border-radius:12px;padding:10px 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chip{font:inherit;font-size:17px;padding:8px 14px;border-radius:20px;border:2px solid var(--plum);background:#fff;color:var(--plum);cursor:pointer;min-height:44px}.chip[disabled]{opacity:.5}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;align-items:center}
+.map{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.ms{font:inherit;text-align:left;border:3px solid var(--mist);background:#fff;border-radius:20px;padding:16px;min-height:130px;cursor:pointer;color:var(--ink);display:flex;gap:14px;align-items:center}
+.ms[disabled]{opacity:.55;cursor:default}.ms.open{border-color:var(--amber);box-shadow:0 0 0 4px #f2a90055}.ms.fin{border-color:var(--leaf);background:#eaf8f1}
+.ms .n{flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 28px Georgia,serif}
+.ms strong{display:block;font-size:22px}.ms span{font-size:16px;color:#46606a}
+.art{display:block;margin:0 auto;max-width:300px;width:70%}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0}
+.stat{background:var(--mist);border-radius:16px;padding:12px;text-align:center}.stat b{display:block;font:700 38px Georgia,serif}
+table{width:100%;border-collapse:collapse;font-size:17px}th,td{padding:8px;border-bottom:1px solid #cfdcdb;text-align:left}
+.chest{position:relative;width:200px;height:150px;margin:30px auto 10px}
+.cb{position:absolute;bottom:0;width:200px;height:84px;background:#b9792f;border:5px solid #5d3a12;border-radius:8px 8px 14px 14px}
+.cb:after{content:"";position:absolute;left:50%;top:-6px;margin-left:-14px;width:28px;height:34px;background:var(--amber);border:4px solid #5d3a12;border-radius:6px}
+.lid{position:absolute;bottom:80px;left:0;width:200px;height:56px;background:#8a5420;border:5px solid #5d3a12;border-radius:70px 70px 6px 6px;transform-origin:0 100%;transition:transform 1s}
+.open .lid{transform:rotate(-62deg)}
+.gem{position:absolute;bottom:70px;width:26px;height:26px;transform:rotate(45deg) scale(0);transition:transform .6s .8s;border-radius:4px}
+.open .gem{transform:rotate(45deg) scale(1)}
+.cf{position:fixed;top:-20px;width:10px;height:16px;animation:fall 3.2s linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.center{text-align:center}
+@media (max-width:560px){.opts,.map{grid-template-columns:1fr}.hud strong{font-size:15px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.cf{display:none}}
+@media print{body{background:#fff}.hud,.row,.noprint{display:none}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+"use strict";
+/* Multiplication Detective: The Missing Treasure. Runs fully offline; results live in memory only. */
+const M=[
+{n:"Equal Groups",tag:"The Garden Gate",c:"#2a9d6f",intro:"The garden gate is locked. Count equal groups to open it.",q:[
+ {s:"Equal groups",t:"Each flower pot holds 4 flowers. How many flowers are in 3 pots?",v:{g:[3,4]},o:[12,7,16,9],a:12,h:["Count the flowers in one pot. Then count the pots.","Use repeated addition: 4 + 4 + 4."],x:"3 groups of 4 is 4 + 4 + 4 = 12, so 3 × 4 = 12."},
+ {s:"Arrays",t:"A seed bed has 4 rows with 5 seeds in each row. How many seeds are there?",v:{a:[4,5]},o:[20,9,25,15],a:20,h:["Count the seeds in one row. Then think about 4 equal rows.","Skip count by 5s four times: 5, 10, 15, ..."],x:"4 rows of 5 is 5 + 5 + 5 + 5 = 20, so 4 × 5 = 20."},
+ {s:"Repeated addition",t:"Which multiplication sentence matches 6 + 6 + 6 + 6?",v:{g:[4,6]},o:["4 × 6","6 × 6","6 + 4","4 × 4"],a:"4 × 6",h:["How many groups are being added? That is the first number.","There are 4 groups, and each group is 6."],x:"Four sixes added together is 4 groups of 6, so 4 × 6 = 24."},
+ {s:"Arrays",t:"A paint tray has 3 rows of 7 paint dots. How many dots are there?",v:{a:[3,7]},o:[21,10,24,18],a:21,h:["Count one row, then think about 3 equal rows.","Try 7 + 7 + 7, or skip count by 7s."],x:"3 rows of 7 is 7 + 7 + 7 = 21, so 3 × 7 = 21."},
+ {s:"Equal groups",t:"There are 5 nests with 3 eggs in each nest. How many eggs are there in all?",v:{g:[5,3]},o:[15,8,12,18],a:15,h:["Count the eggs in one nest. How many nests are there?","Skip count by 3s five times: 3, 6, 9, ..."],x:"5 groups of 3 is 3 + 3 + 3 + 3 + 3 = 15, so 5 × 3 = 15."}]},
+{n:"Missing Factors",tag:"The Parrot’s Safe",c:"#2f80b9",intro:"The parrot hid the treasure map in a safe. Find each missing number to crack it.",tip:"Working backward: cover the ? and count jumps of the known number until you reach the product.",q:[
+ {s:"Missing factors",t:"Find the missing number:",e:"6 × ? = 30",o:[4,5,6,7],a:5,h:["Count by 6s until you reach 30. How many jumps did you make?","6, 12, 18, 24, 30. Count the jumps."],x:"6 × 5 = 30, so the missing factor is 5."},
+ {s:"Missing factors",t:"Find the missing number:",e:"? × 7 = 42",o:[5,6,7,8],a:6,h:["Count by 7s: 7, 14, 21 ... How many jumps to reach 42?","A fact you know: 7 × 5 = 35. How much more to reach 42?"],x:"6 × 7 = 42, so the missing factor is 6."},
+ {s:"Missing factors",k:"t",t:"Type the missing number:",e:"3 × ? = 27",a:9,h:["Skip count by 3s until you land on 27.","3, 6, 9, 12, 15, 18, 21, 24, 27. Count the jumps."],x:"3 × 9 = 27, since nine 3s make 27."},
+ {s:"Missing factors",t:"Find the missing number:",e:"? × 8 = 64",o:[6,7,8,9],a:8,h:["Try a fact you know: 8 × 7 = 56.","How much more is 64 than 56? How many groups of 8 is that?"],x:"8 × 8 = 64, since 8 × 7 = 56 and one more 8 makes 64."},
+ {s:"Missing factors",k:"t",t:"Type the missing number:",e:"4 × ? = 36",a:9,h:["Skip count by 4s: 4, 8, 12 ... Where do you land?","Or think: 4 × 10 = 40. Take away one group of 4."],x:"4 × 9 = 36, because 40 − 4 = 36."}]},
+{n:"Multiplication Detective",tag:"The Case of the Clues",c:"#6b4e9b",intro:"Use the facts you know to crack the case. Trying a strategy counts more than speed.",strat:1,q:[
+ {s:"Facts",t:"What is the product?",e:"7 × 8 = ?",o:[54,56,58,63],a:56,h:["Use a fact you know: 7 × 7 = 49.","One more group of 7 makes 49 + 7."],x:"7 × 8 = 49 + 7 = 56."},
+ {s:"Patterns",k:"t",t:"Find the pattern. What number is missing?",e:"9, 18, 27, ?, 45",a:36,h:["How much does the pattern grow each time?","It adds 9 each time. What is 27 + 9?"],x:"The pattern counts by 9s: 9, 18, 27, 36, 45."},
+ {s:"Facts",t:"What is the product?",e:"6 × 9 = ?",o:[54,56,48,63],a:54,h:["Try 6 × 10 first.","6 × 10 = 60. Now take away one group of 6."],x:"6 × 9 = 60 − 6 = 54."},
+ {s:"Facts",t:"What is the product?",e:"8 × 4 = ?",o:[24,32,36,28],a:32,h:["Doubling can help. Double 8 first.","8 + 8 = 16. Now double 16."],x:"4 × 8 is double, double 8: 16, then 32."},
+ {s:"Facts",t:"Which number sentence is true?",o:["4 × 7 = 28","6 × 8 = 46","9 × 4 = 34","7 × 7 = 47"],a:"4 × 7 = 28",h:["Check one sentence at a time with skip counting.","Try 4 × 7: count by 4s seven times."],x:"4 × 7 = 28. The others should be 6 × 8 = 48, 9 × 4 = 36, and 7 × 7 = 49."}]},
+{n:"Real-Life Challenges",tag:"The Treasure Map",c:"#d4553a",intro:"The map shows places from everyday life. Use equal groups and arrays to read it.",q:[
+ {s:"Word problems",t:"Each shelf holds 8 books. There are 3 shelves. How many books fit on the shelves?",o:[11,24,32,21],a:24,h:["What is one group here, and how many groups are there?","3 groups of 8. Try 8 + 8 + 8."],x:"3 shelves × 8 books = 24 books."},
+ {s:"Word problems",k:"t",t:"Grandpa plants carrots in 5 rows with 8 plants in each row. How many carrot plants are there? Type your answer.",v:{a:[5,8]},a:40,h:["Look at one row. How many plants are in it? Now think about 5 rows.","Skip count by 8s five times: 8, 16, 24 ..."],x:"5 rows of 8 is 8 + 8 + 8 + 8 + 8 = 40."},
+ {s:"Word problems",t:"A museum wall has 7 rows of 7 paintings. How many paintings are there?",v:{a:[7,7]},o:[14,42,49,56],a:49,h:["This is an array: 7 rows with 7 in each row.","7 × 6 = 42. Add one more row of 7."],x:"7 × 7 = 49, because 42 + 7 = 49."},
+ {s:"Explaining reasoning",k:"r",t:"Why is 4 groups of 8 the same as 8 groups of 4?",v:{a:[4,8]},o:["Turn the array: 4 rows of 8 becomes 8 rows of 4, with the same dots.","Because 4 is smaller than 8.","Because both numbers are even.","Because you add 4 and 8 either way."],a:"Turn the array: 4 rows of 8 becomes 8 rows of 4, with the same dots.",h:["Look at the dots. Count the rows, then imagine turning the page.","After turning, what are the rows and what are the columns?"],x:"The same 32 dots can be seen as 4 rows of 8 or 8 rows of 4, so 4 × 8 = 8 × 4."},
+ {s:"Explaining reasoning",k:"r",t:"Lena found 9 × 5 by doing 10 × 5 − 5. Why does that work?",o:["Nine groups is one group less than ten groups, so take away one group of 5.","Because 9 is close to 10, so it is a good guess.","Because you can always subtract in multiplication.","Because 5 + 5 = 10."],a:"Nine groups is one group less than ten groups, so take away one group of 5.",h:["Ten groups of 5 is 50. How is 9 groups different from 10 groups?","What is the difference between 10 groups and 9 groups?"],x:"10 groups of 5 is 50. Taking away one group of 5 leaves 9 groups: 50 − 5 = 45."}]}];
+const TOTAL=M.reduce((n,m)=>n+m.q.length,0);
+const STRATS=["Skip counting","Doubling","Break apart","A fact I know","Drawing it","I just knew it"];
+const OK=["Great detective work!","Yes! You cracked it.","Nice thinking!","That clue fits perfectly.","Sharp eyes, detective!"];
+const TRY=["Not quite yet. Here is a clue.","Good try! Let’s look at a clue.","Detectives keep looking. Try this clue."];
+const COL=["#2a9d6f","#f2a900","#6b4e9b","#d4553a","#2f80b9"];
+const $=s=>document.querySelector(s),app=$("#app");
+let S;
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fresh=()=>{S={m:0,i:0,open:0,log:[],gems:0,stars:0,hints:0,cur:null}};
+const cq=()=>M[S.m].q[S.i];
+function render(h){app.innerHTML=h;window.scrollTo(0,0);const f=app.querySelector("h1,h2");if(f){f.tabIndex=-1;f.focus({preventScroll:true})}}
+function hud(){return `<header class="hud"><strong>Multiplication Detective</strong><div class="meter" role="img" aria-label="Treasure progress: ${S.log.length} of ${TOTAL} clues"><span style="width:${S.log.length/TOTAL*100}%"></span></div><span>Clues found: ${S.gems}</span></header>`}
+function vis(v){if(!v)return "";if(v.g)return `<div class="vis" role="img" aria-label="${v.g[0]} groups of ${v.g[1]} dots">`+Array.from({length:v.g[0]},(_,i)=>`<div class="grp">`+`<i style="background:${COL[i%5]}"></i>`.repeat(v.g[1])+`</div>`).join("")+`</div>`;
+ const[r,c]=v.a;return `<div class="arr" role="img" aria-label="Array with ${r} rows and ${c} columns" style="grid-template-columns:repeat(${c},20px)">`+Array.from({length:r*c},(_,i)=>`<i style="background:${COL[Math.floor(i/c)%5]}"></i>`).join("")+`</div>`}
+const art=`<svg class="art" viewBox="0 0 300 200" role="img" aria-label="A magnifying glass over a treasure chest"><rect x="60" y="110" width="150" height="70" rx="10" fill="#b9792f" stroke="#5d3a12" stroke-width="6"/><path d="M60 112a75 62 0 0 1 150 0z" fill="#8a5420" stroke="#5d3a12" stroke-width="6"/><rect x="123" y="104" width="24" height="30" rx="5" fill="#f2a900" stroke="#5d3a12" stroke-width="4"/><circle cx="215" cy="70" r="46" fill="#bfe9f3" fill-opacity=".45" stroke="#f2a900" stroke-width="12"/><path d="M248 104l34 40" stroke="#f2a900" stroke-width="16" stroke-linecap="round"/><path d="M200 50a30 30 0 0 1 22-10" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/></svg>`;
+
+function title(){render(`<section class="card center"><h1>Multiplication Detective: The Missing Treasure</h1>${art}<p style="font-size:21px;max-width:520px;margin:6px auto 18px">Detective Nala, a treasure chest has gone missing! Solve four missions to follow the clues and find it. Take your time. Hints are always here to help.</p><button class="btn" data-a="start">Start Game</button></section>`)}
+function mapScreen(){render(hud()+`<section class="card"><h2>The Treasure Map</h2><p class="meta">Finish each mission to find a piece of the map.</p><div class="map">`+M.map((m,i)=>{const st=i<S.open?"fin":i==S.open?"open":"";return `<button class="ms ${st}" data-a="mission" data-i="${i}" ${i>S.open||i<S.open?"disabled":""}><span class="n" style="background:${m.c}">${i<S.open?"✓":i+1}</span><div><strong>${m.n}</strong><span>${m.tag}. ${i<S.open?"Complete":i==S.open?"Ready to play":"Locked until the last mission is done"}</span></div></button>`}).join("")+`</div><div class="row"><button class="btn alt" data-a="restart">Restart</button></div></section>`)}
+function startMission(i){S.m=i;S.i=0;const m=M[i];render(hud()+`<section class="card"><p class="meta">Mission ${i+1} of 4</p><h2>${m.n}: ${m.tag}</h2><p class="q">${m.intro}</p>${m.tip?`<p class="tip">${m.tip}</p>`:""}<div class="row"><button class="btn" data-a="go">Begin mission</button><button class="btn alt" data-a="map">Back to map</button></div></section>`)}
+function question(){const m=M[S.m],q=cq();
+ S.cur={w:0,hn:0,done:false,o:q.o?(typeof q.o[0]=="number"?[...q.o].sort((a,b)=>a-b):shuf(q.o)):null};
+ const pds=m.q.map((_,j)=>`<span class="pd ${j<S.i?"on":j==S.i?"now":""}"></span>`).join("");
+ const ans=q.k=="t"?`<div class="typed"><label for="ti">Your answer</label><input id="ti" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="3"><button class="btn" data-a="check">Check</button></div>`:`<div class="opts ${q.k=="r"?"long":""}">`+S.cur.o.map((o,i)=>`<button class="opt" data-a="pick" data-i="${i}"><b>${i+1}</b><span>${o}</span></button>`).join("")+`</div>`;
+ render(hud()+`<section class="card"><p class="meta">Mission ${S.m+1}: ${m.n}. Question ${S.i+1} of ${m.q.length}</p><div class="pds" aria-hidden="true">${pds}</div>${m.tip?`<p class="tip">${m.tip}</p>`:""}<p class="q">${q.t}</p>${q.e?`<div class="eq">${q.e}</div>`:""}${vis(q.v)}${ans}<div id="msg" aria-live="polite"></div><ul class="hints" id="hints"></ul><div class="row" id="acts"><button class="btn alt" data-a="hint">Need a hint?</button><button class="btn alt" data-a="map">Back to map</button></div></section>`);
+ const ti=$("#ti");if(ti)ti.focus({preventScroll:true})}
+function showHints(){const q=cq(),c=S.cur;$("#hints").innerHTML=q.h.slice(0,c.hn).map(h=>`<li>${h}</li>`).join("")}
+function hint(){const q=cq(),c=S.cur;if(c.done)return;if(c.hn<q.h.length){c.hn++;S.hints++}showHints();if(c.hn>=q.h.length)$("[data-a=hint]").disabled=true}
+function answer(i){const q=cq(),c=S.cur;if(c.done)return;
+ if(q.k=="t"){const v=$("#ti").value.trim();if(!/^\d+$/.test(v)){$("#msg").innerHTML=`<p class="soft">Type a number first, then press Check.</p>`;return}
+  v==String(q.a)?right():wrong(null);return}
+ const b=document.querySelector(`.opt[data-i="${i}"]`);c.o[i]===q.a?right():wrong(b)}
+function wrong(b){const q=cq(),c=S.cur;c.w++;if(b){b.classList.add("tried");b.disabled=true}
+ if(c.w>=(q.k=="t"?3:2)){finish("shown");return}
+ if(c.hn<q.h.length){c.hn++;S.hints++}
+ $("#msg").innerHTML=`<p class="soft">${rnd(TRY)}</p>`;showHints();
+ if(q.k=="t"){const t=$("#ti");t.select();t.focus()}}
+function right(){finish(S.cur.w>0||S.cur.hn>0?"help":"first")}
+function finish(res){const q=cq(),c=S.cur,m=M[S.m];c.done=true;
+ S.log.push({s:q.s,m:S.m,res,w:c.w,hn:c.hn});if(res!="shown")S.gems++;
+ document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(c.o[i]===q.a)b.classList.add("right")});
+ const ti=$("#ti");if(ti){ti.disabled=true;$("[data-a=check]").disabled=true}
+ const last=S.i==m.q.length-1;
+ let h=res=="shown"?`<p class="soft">Let’s look at this one together. The answer is ${q.a}.</p>`:`<p class="good">${res=="help"?"You kept going and solved it! Well done.":rnd(OK)}</p>`;
+ h+=`<p class="why">${q.x}</p>`;
+ if(m.strat&&res!="shown")h+=`<p style="font-weight:700;margin:12px 0 4px">Which strategy helped you? (optional)</p><div class="chips" id="chips">`+STRATS.map((s,i)=>`<button class="chip" data-a="strat" data-i="${i}">${s}</button>`).join("")+`</div><p id="star" aria-live="polite"></p>`;
+ $("#msg").innerHTML=h;$("#hints").innerHTML="";
+ $("#acts").innerHTML=`<button class="btn" id="nx" data-a="next">${last?"Finish mission":"Next question"}</button><button class="btn alt" data-a="map">Back to map</button>`;
+ $("#nx").focus({preventScroll:false});
+ const mt=$(".meter span");if(mt){mt.style.width=S.log.length/TOTAL*100+"%"}}
+function strat(b){if(b.dataset.done)return;S.stars++;b.dataset.done=1;b.style.background="#efe7fb";document.querySelectorAll(".chip").forEach(x=>x.disabled=true);$("#star").innerHTML=`<span class="good">Strategy star earned for using ${STRATS[b.dataset.i].toLowerCase()}!</span>`;S.log[S.log.length-1].st=STRATS[b.dataset.i]}
+function next(){if(S.i<M[S.m].q.length-1){S.i++;question()}else missionDone()}
+function missionDone(){const m=M[S.m];S.open=Math.max(S.open,S.m+1);const f=S.m==3;
+ render(hud()+`<section class="card center"><h2>Mission ${S.m+1} complete!</h2><p class="q">You found a piece of the treasure map.</p><div style="width:120px;height:120px;margin:10px auto;border-radius:22px;background:${m.c};transform:rotate(${S.m*7-10}deg);display:grid;place-items:center;color:#fff;font:700 52px Georgia,serif;box-shadow:0 6px 0 #0003">${S.m+1}</div><p style="font-size:20px">${f?"All four pieces fit together. Time to open the chest!":"Ready for the next mission?"}</p><button class="btn" data-a="${f?"final":"map"}">${f?"Open the treasure chest":"Back to the map"}</button></section>`);confetti(14)}
+function confetti(n){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;for(let i=0;i<n;i++){const s=document.createElement("span");s.className="cf";s.style.cssText=`left:${Math.random()*100}vw;background:${rnd(COL)};animation-delay:${Math.random()*.8}s`;document.body.appendChild(s);setTimeout(()=>s.remove(),4200)}}
+function final(){const g=["#d4553a","#2f80b9","#2a9d6f","#6b4e9b","#f2a900"].map((c,i)=>`<i class="gem" style="left:${20+i*35}px;background:${c}"></i>`).join("");
+ render(`<section class="card center"><h1>You found the Missing Treasure!</h1><div class="chest" id="ch"><div class="cb"></div>${g}<div class="lid"></div></div><p style="font-size:22px;max-width:560px;margin:8px auto">Brilliant work, Detective Nala. You collected ${S.gems} clues and ${S.stars} strategy ${S.stars==1?"star":"stars"} on your way to the treasure.</p><div class="row" style="justify-content:center"><button class="btn" data-a="summary">See teacher summary</button><button class="btn alt" data-a="restart">Restart</button></div></section>`);
+ setTimeout(()=>$("#ch")&&$("#ch").classList.add("open"),300);confetti(40)}
+function summary(){const L=S.log,n=L.length,c=r=>L.filter(x=>x.res==r).length,first=c("first"),help=c("help"),shown=c("shown");
+ const by={};L.forEach(x=>{const k=by[x.s]=by[x.s]||{n:0,first:0,help:0,shown:0};k.n++;k[x.res]++});
+ const rows=Object.keys(by).map(s=>{const k=by[s],need=k.shown>0||k.first<k.n/2;return `<tr><td>${s}</td><td>${k.n}</td><td>${k.first}</td><td>${k.help}</td><td>${k.shown}</td><td>${need?"Practice again":"Looking secure"}</td></tr>`}).join("");
+ const need=Object.keys(by).filter(s=>by[s].shown>0||by[s].first<by[s].n/2);
+ const retried=L.filter(x=>x.w>0).length,rec=L.filter(x=>x.w>0&&x.res=="help").length,hn=L.filter(x=>x.hn>0).length;
+ const obs=[];
+ if(retried)obs.push(`Nala kept trying after a first miss on ${retried} ${retried==1?"question":"questions"} and went on to solve ${rec} of ${retried==1?"it":"them"}.`);else obs.push("Nala answered every question without needing a second attempt.");
+ if(hn)obs.push(`Hints were used on ${hn} ${hn==1?"question":"questions"}. Asking for help is a strong learning strategy.`);
+ if(S.stars)obs.push(`Nala named a strategy ${S.stars} ${S.stars==1?"time":"times"}, such as ${[...new Set(L.filter(x=>x.st).map(x=>x.st.toLowerCase()))].join(", ")}.`);
+ if(shown)obs.push(`${shown} ${shown==1?"question was":"questions were"} worked through together, which shows where to focus next time.`);
+ obs.push("The game had no timer or penalties, so these results reflect thinking rather than speed.");
+ render(`<section class="card"><h2>Teacher summary</h2><p class="meta">Results stay on this screen only. Nothing is saved or sent.</p><div class="stats"><div class="stat"><b>${n}</b>Questions attempted</div><div class="stat"><b>${first}</b>Correct on first attempt, no hint</div><div class="stat"><b>${help}</b>Solved after hints or retries</div><div class="stat"><b>${shown}</b>Answer shown with explanation</div></div><h3>Skills</h3><div style="overflow-x:auto"><table><thead><tr><th>Skill</th><th>Asked</th><th>First try</th><th>After help</th><th>Shown</th><th>Next step</th></tr></thead><tbody>${rows}</tbody></table></div><p class="why" style="margin-top:12px"><strong>May need more practice:</strong> ${need.length?need.join(", "):"No areas stood out. Try mixed facts for a new challenge."}</p><h3>Observations</h3><ul style="font-size:19px;line-height:1.5">${obs.map(o=>`<li>${o}</li>`).join("")}</ul><div class="row"><button class="btn" data-a="restart">Restart</button><button class="btn alt noprint" data-a="print">Print summary</button></div></section>`)}
+const act={start:()=>mapScreen(),mission:b=>startMission(+b.dataset.i),go:()=>question(),map:()=>mapScreen(),pick:b=>answer(+b.dataset.i),check:()=>answer(),hint,next,strat,final,summary,print:()=>window.print(),restart:()=>{fresh();title()}};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(b&&!b.disabled&&act[b.dataset.a])act[b.dataset.a](b)});
+document.addEventListener("keydown",e=>{const t=e.target;if(e.key=="Enter"&&t.id=="ti"){e.preventDefault();answer()}
+ else if(/^[1-4]$/.test(e.key)&&S&&S.cur&&!S.cur.done&&t.tagName!="INPUT"){const b=document.querySelector(`.opt[data-i="${e.key-1}"]`);if(b&&!b.disabled)b.click()}});
+fresh();title();
+</script>
+</body>
+</html>
